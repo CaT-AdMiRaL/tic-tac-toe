@@ -13,22 +13,78 @@ titleLabel.grid(row=0, column=0)
 frame2 = Frame(root, bg="green")
 frame2.pack()
 
+board = {1: " ", 2: " ", 3: " ",
+         4: " ", 5: " ", 6: " ",
+         7: " ", 8: " ", 9: " "}
+
 
 turn = "x"
 game_end = False
 
+def updateBoard():
+    for key in board.keys():  # по ключам 1. 2..
+        buttons[key - 1]["text"] = board[key]  # по всему списку обновляем борд
+
+def checkForWin(player):
+    # rows
+    if board[1] == board[2] and board[2] == board[3] and board[3] == player:
+        return True
+
+    elif board[4] == board[5] and board[5] == board[6] and board[6] == player:
+        return True
+
+    elif board[7] == board[8] and board[8] == board[9] and board[9] == player:
+        return True
+
+    # columns
+    elif board[1] == board[4] and board[4] == board[7] and board[7] == player:
+        return True
+
+    elif board[2] == board[5] and board[5] == board[8] and board[8] == player:
+        return True
+
+    elif board[3] == board[6] and board[6] == board[9] and board[9] == player:
+        return True
+
+    # diagonals
+    elif board[1] == board[5] and board[5] == board[9] and board[9] == player:
+        return True
+
+    elif board[3] == board[5] and board[5] == board[7] and board[7] == player:
+        return True
+
+    return False
 
 def play(event):
-    global turn
-    button = event.widget
-    print(button) # на какую кнопку нажали - ссылка
+    global turn, game_end
+    if game_end:
+        return
+
+    button = event.widget  # возврат ссылки на событие - какую кнопку нажали
+    buttonText = str(button)  # перевели в текстовое сообщение
+    clicked = buttonText[-1]  # перевели в форма прогр по нашему 9 - по код 8
+    if clicked == "n":
+        clicked = 1
+    else:
+        clicked = int(clicked)
+
     if button["text"] == " ":
         if turn == "x":
-            button["text"] = "x"
+            board[clicked] = turn
+            if checkForWin(turn):
+                winningLabel = Label(frame1, text=f"{turn} wins the game", bg="orange", font=("Arial", 26), width=16)
+                winningLabel.grid(row=0, column=0, columnspan=3)
+                game_end = True
             turn = "o"
+            updateBoard()
 
         else:
-            button["text"] = "o"
+            board[clicked] = turn
+            updateBoard()
+            if checkForWin(turn):
+                winningLabel = Label(frame1, text=f"{turn} wins the game", bg="orange", font=("Arial", 26), width=16)
+                winningLabel.grid(row=0, column=0, columnspan=3)
+                game_end = True
             turn = "x"
 
 
@@ -72,5 +128,6 @@ button9 = Button(frame2, text=" ", width=4, height=2, font=("Arial", 30), bg="ye
 button9.grid(row=2, column=2)
 button9.bind("<Button-1>", play)
 
+buttons = [button1, button2, button3, button4, button5, button6, button7, button8, button9]
 
 root.mainloop()
